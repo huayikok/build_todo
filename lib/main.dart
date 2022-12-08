@@ -1,11 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp().whenComplete(() {
+    debugPrint('Firebase has been initialized.');
+  });
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -30,7 +36,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key key, @required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -95,13 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            const Text('You have pushed the button this many times:'),
+            Text('$_counter', style: Theme.of(context).textTheme.headline4),
+            ElevatedButton(onPressed: retrieveDocUsingCondition, child: Text('Execute Command')),
           ],
         ),
       ),
@@ -111,5 +113,75 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  final firestoreInstance = FirebaseFirestore.instance;
+
+  // Create new data.
+  void addData() {
+    firestoreInstance.collection('users').add({
+      'name': 'Jeans Lim',
+      'age': 20,
+      'email': 'jeans@gmail.com',
+      'address': {'street': 'Street 22', 'city': 'Nahus'},
+    }).then((value) {
+      debugPrint('Data added successfully');
+      debugPrint(value.id);
+    });
+  }
+
+  // Replace selected data. Whole data will be overwrite.
+  void replaceData() {
+    firestoreInstance.collection('users').doc('Z9xSsob48Duj4XiZuriA').set({
+      'name': 'adam',
+      'age': 50,
+      'email': 'adam@gmail.com',
+    }).then((value) {
+      debugPrint('Data replaced successfully');
+    });
+  }
+
+  // Update selected data. Part of change data will be update.
+  void updateData() {
+    firestoreInstance.collection('users').doc('Z9xSsob48Duj4XiZuriA').update({
+      'name': 'adam',
+      'age': 60,
+      'email': 'adam@gmail.com',
+      'address': {'street': 'Street 31', 'city': 'Ade'},
+    }).then((value) {
+      debugPrint('Data updated successfully');
+    });
+  }
+
+  // Delete selected data.
+  void deleteData() {
+    firestoreInstance.collection('users').doc('Z9xSsob48Duj4XiZuriA').delete().then((value) {
+      debugPrint('Data deleted successfully');
+    });
+  }
+
+  // Delete field from selected data. Part of data will be delete.
+  void deleteField() {
+    firestoreInstance.collection('users').doc('Z9xSsob48Duj4XiZuriA').update({"username": FieldValue.delete()}).then((value) {
+      debugPrint('Field deleted successfully');
+    });
+  }
+
+  void retrieveOnce() {
+    firestoreInstance.collection('users').get().then((value) {
+      value.docs.forEach((result) {
+        debugPrint(result.data().toString());
+      });
+      debugPrint('Data retrieved successfully');
+    });
+  }
+
+  void retrieveDocUsingCondition() {
+    firestoreInstance.collection('users').where('age', isLessThanOrEqualTo: 20).get().then((value) {
+      value.docs.forEach((result) {
+        debugPrint(result.data().toString());
+      });
+      debugPrint('Data retrieved successfully');
+    });
   }
 }
