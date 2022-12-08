@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.build_todo">
+    package="com.huayikok.build_todo">
    <application
         android:label="build_todo"
         android:name="${applicationName}"
