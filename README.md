@@ -15,6 +15,8 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-Only andriod.
+
+## Notice
+This app is tested by android.
 Flutter version: flutter-2.8.1-stable
 Dart SDK version: 2.15.1
